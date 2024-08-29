@@ -1,1 +1,1 @@
-LOG_DIR = "log"
+LOG_PATH = "log"

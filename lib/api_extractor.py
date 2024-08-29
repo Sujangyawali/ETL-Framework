@@ -6,4 +6,7 @@ class APIExtractor:
         self.api_key = api_key
         self.headers = headers
         self.params = params
-        pass
+    
+    def api_call(self):
+        response = requests.get(self.api_url, headers=self.headers, params=self.params)
+        
