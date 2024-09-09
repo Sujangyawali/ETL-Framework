@@ -1,12 +1,13 @@
 import datetime
 import os
-from config.constants import *
-
+from config import constants
+from config.env_setup import *
 class Logger:
     def __init__(self, script_name):
-        current_time = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S%")
+        current_time = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         log_path = os.getenv("LOG_PATH")
         log_file_name = str(script_name) + "_" + str(current_time) + ".log"
+        print(log_path,log_file_name)
         log_file = os.path.join(log_path, log_file_name)
         self.log_file = open(log_file,'w')
 
