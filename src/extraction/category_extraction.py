@@ -4,7 +4,8 @@ from config.env_setup import *
 from lib.api_extractor import APIExtractor
 
 
-script_name=os.path.basename(__file__)
+script_name = os.path.basename(__file__)
+script_name = os.path.splitext(script_name)[0]
 log = Logger(script_name)
 log.log_message(f"Scripts for {script_name} has been started")
 
@@ -35,9 +36,11 @@ api_instance = APIExtractor(url, API_KEY, headers = headers, params = params, lo
 
 log.log_message(f"Completed API object for initialization")
 
-
 try:
-    pass
+    log.log_message(f"Ready for API request")
+    json_response = api_instance.api_request()
+    if json_response:
+        log.log_message(f"Received JSON response")
 except:
     pass
 finally:
