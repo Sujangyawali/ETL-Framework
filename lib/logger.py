@@ -14,7 +14,7 @@ class Logger:
     def log_message(self, msg, level = "INFO", boxed = True):
         now = datetime.datetime.now()
         log_level = level.upper()
-        log_msg = f"[{now}]: {log_level} - {msg}\n"
+        log_msg = f"[{now}]: {log_level} - \n {msg}\n"
         log_msg += "\n******************************************************************************************\n"
         self.log_file.write(log_msg)
         self.log_file.flush()

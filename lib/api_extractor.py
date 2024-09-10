@@ -11,15 +11,15 @@ class APIExtractor:
     
     def api_request(self):
         try:
-            self.log.log_message(f"Sending GET request to {self.api_url} with params: {self.params}")
+            self.log.log_message(f"Sending GET request to {self.api_url}.\n Parameters: {self.params}")
             response = requests.get(self.api_url, headers=self.headers, params=self.params)
             if response.status_code == 200:
                 self.log.log_message(f"API request successful.")
                 json_response = response.json()
                 return json_response
             else:
-                self.log.log_message(f"API request failed with status code {response.status_code}")
-            
+                self.log.log_message(f"API request failed with status code {response.status_code}\n.Messages:{response.json()['messages']}")
         except Exception as e:
+            print(e)
             self.log.log_message(f"An error occured {e}")
         
