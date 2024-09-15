@@ -15,8 +15,8 @@ class APIExtractor:
             response = requests.get(self.api_url, headers=self.headers, params=self.params)
             if response.status_code == 200:
                 self.log.log_message(f"API request successful.")
-                json_response = response.json()
-                return json_response
+                responsed_dict = response.json()
+                return responsed_dict
             else:
                 self.log.log_message(f"API request failed with status code {response.status_code}\n.Messages:{response.json()['messages']}")
         except Exception as e:
