@@ -27,7 +27,7 @@ class MySQLDataExtractor:
                 password = self.password,
                 database = self.database,
                 cursorclass = pymysql.cursors.DictCursor)
-            self.log.log_message("Database connection started.")
+            self.log.log_message("Database session started.")
         except pymysql.MySQLError as e:
             self.log.log_message("Unable to connect to MySQL database.")
             raise Exception(f"Error connecting to MySQL: {str(e)}")

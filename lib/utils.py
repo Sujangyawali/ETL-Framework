@@ -13,3 +13,11 @@ def convert_to_csv(data:dict, csv_file_name:str, headers:list):
     df = pd.DataFrame(data, columns=headers)
     df.to_csv(csv_file_name, index=False)
     return csv_file_name
+
+def format_query(column_list, schema_name, database_name, table_name, where_condition=None):
+    columns = ', '.join(column_list)
+    query = f"SELECT {columns} FROM {database_name}.{schema_name}.{table_name}"
+    if where_condition:
+        query += f" WHERE {where_condition}"
+    query += ";"
+    return query
