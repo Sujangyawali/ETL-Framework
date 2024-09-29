@@ -11,8 +11,11 @@ ROOT_URL = os.getenv('ROOT_URL')
 ROOT_URL = os.getenv('DATA_DIR')
 
 #DATABSE ENV VARIABLES
-DB_HOST = 'DB_HOST'
-DB_USER = 'DB_USER'
-DB_PASSWORD = 'DB_PASSWORD'
-DB_NAME = 'DB_NAME'
-DB_PORT = 'DB_PORT'
+DB_HOST = os.getenv('DB_HOST')
+DB_USER = os.getenv('DB_USER')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_NAME = os.getenv('DB_NAME')
+DB_PORT = os.getenv('DB_PORT')
+
+#ENVIRONMENT SETTINGS
+DATA_DIR = os.getenv('DATA_DIR')
