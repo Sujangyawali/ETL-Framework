@@ -17,10 +17,9 @@ DB_HOST = DB_HOST
 DB_USER = DB_USER
 DB_PASSWORD = DB_PASSWORD
 DB_NAME = DB_NAME
-DB_PORT = DB_PORT
-
-EXT_SRC_SCHEMA='SCHEMA_NAME'
-SOURCE_TABLE ='TABLE_NAME'
+DB_PORT = int(DB_PORT)
+EXT_SRC_SCHEMA='RDW_DWH'
+SOURCE_TABLE ='SALES_DATA'
 SOURCE_TABLE_COLUMNS = ['TRANSACTION_ID','TRANSACTION_LINE_ID','STORE_ID','REGISTER_ID','EMPLOYEE_ID','CUSTOMER_ID','LOYALTY_CARD_NUMBER',
 'ITEM_ID','ITEM_DESCRIPTION','QUANTITY','PRICE','DISCOUNT','TAX','TOTAL_AMOUNT','PAYMENT_METHOD','TRANSACTION_STATUS',
 'RETURN_FLAG','PROMOTION_CODE','SALES_CHANNEL','RECEIPT_NUMBER','SALE_DATE','CURRENCY']
@@ -30,17 +29,15 @@ log.log_message("Database instance created")
 
 try:
     db.connect()
-    log.log_message(" Extracting data from  ${EXT_SRC_SCHEMA}.${SOURCE_TABLE} Started...")
+    log.log_message(f" Extracting data from  {EXT_SRC_SCHEMA}.{SOURCE_TABLE} Started...")
     EXTRACT_SQL = format_query(EXT_SRC_SCHEMA, SOURCE_TABLE, SOURCE_TABLE_COLUMNS )
     log.log_message(f"Extraction Query:\n {EXTRACT_SQL}")
     data = db.get_data(EXTRACT_SQL)
-    print(data)
-    
+    print(data[0])
 except Exception as e:
-    log.log_message(f"Something went wrong while API extraction:{e}")
     raise Exception(f"[ERROR]: Error while extracting from MYsql Database.")
 finally:
-    db.end_connection
+    db.end_connection()
     log.log_message(f"Closed database connection.")
     log.close()
 

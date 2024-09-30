@@ -35,7 +35,7 @@ def format_query(schema_name:str, table_name:str, column_list:list, where_condit
         "SELECT id, name, salary FROM my_schema.employees WHERE age > 30"
 
     """
-    columns = ', '.join(column_list)
+    columns = '\n, '.join(column_list)
     query = f"SELECT {columns} FROM {schema_name}.{table_name}"
     if where_condition:
         query += f" WHERE {where_condition}"

@@ -20,31 +20,34 @@ class MySQLDataExtractor:
     def connect(self):
         self.log.log_message("Database connection started.")
         try:
-            self.cursor = pymysql.connect(
+            self.connection = pymysql.connect(
                 host = self.host,
                 port = self.port, 
                 user = self.user, 
                 password = self.password,
                 database = self.database,
                 cursorclass = pymysql.cursors.DictCursor)
+            self.cursor=self.connection.cursor()
             self.log.log_message("Database session started.")
-        except pymysql.MySQLError as e:
+        except Exception as e:
             self.log.log_message("Unable to connect to MySQL database.")
-            raise Exception(f"Error connecting to MySQL: {str(e)}")
+            raise Exception(f"Error connecting to MySQL: {e}")
     
     def get_data(self, query: str):
         self.query = query
-        self.log.log_message(f"{self.query}")
         try:
+            self.cursor.execute(f"USE  {self.database}")
             self.cursor.execute(self.query)
             self.log.log_message("Query executed.")
             result =  self.cursor.fetchall()
-            self.log.log_message("Number of rows:" + str(self.db.rowcount))
+            self.log.log_message("Number of rows:" + str(self.cursor.rowcount))
             return result
-        except pymysql.MySQLError as e:
-            self.log.log_message("Error executing query.\n {e}")
+        except Exception as e:
+            self.log.log_message(f"Error executing query.\n {e}")
+            raise Exception(f"Error executing query: {e}")
     
     def end_connection(self):
-        self.cursor.close()
+        self.connection.close()
         self.log.log_message("Database Session Closed")
+        
 
