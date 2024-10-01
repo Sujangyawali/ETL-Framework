@@ -32,8 +32,7 @@ try:
     log.log_message(f" Extracting data from  {EXT_SRC_SCHEMA}.{SOURCE_TABLE} Started...")
     EXTRACT_SQL = format_query(EXT_SRC_SCHEMA, SOURCE_TABLE, SOURCE_TABLE_COLUMNS )
     log.log_message(f"Extraction Query:\n {EXTRACT_SQL}")
-    data = db.get_data(EXTRACT_SQL)
-    print(data[0])
+    db.extract_to_csv(EXTRACT_SQL, SOURCE_TABLE.lower(), chunk_size=100)
 except Exception as e:
     raise Exception(f"[ERROR]: Error while extracting from MYsql Database.")
 finally:
