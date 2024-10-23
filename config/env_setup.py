@@ -17,5 +17,12 @@ DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_NAME = os.getenv('DB_NAME')
 DB_PORT = os.getenv('DB_PORT')
 
+#SFTP VARIABLES
+SFTP_HOST = os.getenv('SFTP_HOST')
+SFTP_PORT = os.getenv('SFTP_PORT')
+SFTP_USER = os.getenv('SFTP_USER')
+SFTP_PASSWORD = os.getenv('SFTP_PASSWORD')
+
+
 #ENVIRONMENT SETTINGS
 DATA_DIR = os.getenv('DATA_DIR')

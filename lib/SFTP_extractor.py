@@ -2,9 +2,9 @@ from lib.logger import Logger
 import pysftp
 
 class SFTP:
-    def __init__(self, host, post, username, password = None, keyfile = None, log = Logger):
+    def __init__(self, host, port, username, password = None, keyfile = None, log = Logger):
         self.host = host
-        self.port = post
+        self.port = port
         self.username = username
         self.password = password
         self.keyfile = keyfile
@@ -45,5 +45,6 @@ class SFTP:
         pass
 
     def close(self):
-        pass
+        if self.sftp:
+            self.sftp.close()
         
