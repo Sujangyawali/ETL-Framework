@@ -10,7 +10,7 @@ LOG_PATH = os.getenv('LOG_PATH')
 ROOT_URL = os.getenv('ROOT_URL')
 ROOT_URL = os.getenv('DATA_DIR')
 
-#DATABSE ENV VARIABLES
+#MYSQL DATABSE ENV VARIABLES
 DB_HOST = os.getenv('DB_HOST')
 DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
@@ -26,3 +26,11 @@ SFTP_PASSWORD = os.getenv('SFTP_PASSWORD')
 
 #ENVIRONMENT SETTINGS
 DATA_DIR = os.getenv('DATA_DIR')
+
+#SNOWFLAKE DATABSE VARIABLE
+SF_ACCOUNT = os.getenv('SF_ACCOUNT')
+SF_USER = os.getenv('SF_USER')
+SF_PASSWORD = os.getenv('SF_PASSWORD')
+SF_WAREHOUSE = os.getenv('SF_WAREHOUSE')
+SF_DATABASE = os.getenv('SF_DATABASE')
+SF_ROLE = os.getenv('SF_ROLE')

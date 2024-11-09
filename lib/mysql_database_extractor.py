@@ -20,7 +20,7 @@ class MySQLDataExtractor:
         self.log = log
 
     def connect(self):
-        self.log.log_message("Database connection started.")
+        self.log.log_message("MySQL database connection started.")
         try:
             self.connection = pymysql.connect(
                 host = self.host,

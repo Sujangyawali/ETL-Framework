@@ -5,3 +5,4 @@ test_api_object.ipynb
 data
 get_sample_data.ipynb
 Product.csv
+snowflake_config.sql
