@@ -29,11 +29,11 @@ class S3ObjectManager:
             self.log.log_message(f"Failed to connect to S3.")
             raise Exception(f"Failed to connect to S3\n {s3_e}")
 
-    def upload_csv_to_s3_landing(self, file_name):
+    def upload_csv_to_s3_landing(self, file_name,file_name_on_bucket):
         landing_bucket = AWS_S3_LANDING_BUCKET
         self.log.log_message(f"Uploading of file: {file_name} to bucekt {landing_bucket}.")
         try:
-            self.s3_client.upload_file(file_name, landing_bucket,file_name)
+            self.s3_client.upload_file(file_name, landing_bucket,file_name_on_bucket)
             self.log.log_message(f"File uploaded to S3 bucket: {landing_bucket} successfully")
         except Exception as upld_e:
             self.log.log_message(f"Failed to upload file to S3 bucket: {landing_bucket}")

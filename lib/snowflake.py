@@ -43,6 +43,27 @@ class SnowflakeDatabase:
             self.log.log_message(f"Error executing query.\n {qe}")
             raise Exception(f"Error executing query: {qe}")
     
+    def load_s3_to_landing(self, s3_file, landing_table):
+        self.log.log_message(f"Loading data from S3 to landing table: {landing_table}")
+        truncate_query = f"""
+                            TRUNCATE TABLE {SF_LANDING_SCHEMA}.{landing_table}
+                            """
+        load_query = f"""
+                    COPY INTO {SF_LANDING_SCHEMA}.{landing_table}
+                    FROM @{SF_STAGE_SCHEMA}.{SF_STAGE}
+                    FILES = ('{s3_file}')
+                    """
+        try:
+            self.log.log_message("Truncating landing table")
+            self.execute_query(truncate_query)
+            self.log.log_message("Landing table truncated")
+            self.log.log_message("Loading data into landing table")
+            self.execute_query(load_query)
+            self.log.log_message("Landing table loaded")
+        except Exception as e:
+            self.log.log_message(f"Error loading data from S3 to landing table: {e}")
+            raise Exception(f"Error loading data from S3 to landing table: {e}")
+        
     def end_connection(self):
         if self.connection:
             self.connection.close()
