@@ -78,6 +78,7 @@ class MySQLDataExtractor:
                         self.log.log_message(f"Data extraction to CSV completed.")
                 except Exception as csve:
                     self.log.log_message(f"Error writing data to CSV file: {csve}")
+            return csv_file_name if csv_file_name else None
     def end_connection(self):
         self.connection.close()
         self.log.log_message("Database Session Closed")
