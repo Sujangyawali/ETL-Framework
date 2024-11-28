@@ -5,6 +5,7 @@ from lib.mysql_database_extractor import MySQLDataExtractor
 from lib.utils import convert_to_csv, format_query
 from lib.s3_operations import S3ObjectManager
 from lib.snowflake import SnowflakeDatabase
+from lib.script_execution_logger import ScriptExeLog
 
 
 script_name = os.path.basename(__file__)
@@ -28,6 +29,10 @@ SOURCE_TABLE_COLUMNS = ['TRANSACTION_ID','TRANSACTION_LINE_ID','STORE_ID','REGIS
 SF_LANDING_TABLE = 'LND_SALES'
 
 db = MySQLDataExtractor(DB_HOST,DB_PORT, DB_USER, DB_PASSWORD,DB_NAME,log)
+sf_object = SnowflakeDatabase(log)
+sf_object.connect()
+
+script_exe_log_object = ScriptExeLog(sf_object, script_name, SF_LANDING_TABLE)
 log.log_message("Database instance created")
 
 try:
@@ -41,8 +46,6 @@ try:
         s3_file_object = S3ObjectManager(log)
         s3_file_object.connect_s3()
         s3_file_object.upload_csv_to_s3_landing(csv_file, file_name_on_bucket)
-        sf_object = SnowflakeDatabase(log)
-        sf_object.connect()
         sf_object.load_s3_to_landing(file_name_on_bucket, SF_LANDING_TABLE)
 except Exception as e:
     raise Exception(f"[ERROR]: Error while extracting from MYsql Database.")

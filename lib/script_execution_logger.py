@@ -1,18 +1,30 @@
-
+from config.env_setup import *
+from lib.snowflake import SnowflakeDatabase
 class ScriptExeLog:
-    def __init__(self, log_table_schema, script_name, landing_table):
-        self.log_table_schema = log_table_schema
+    def __init__(self, sf_db: SnowflakeDatabase, script_name, landing_table):
         self.script_name = script_name
         self.landing_table = landing_table
+        self.sf_db = sf_db
+        self.batch_date, self.batch_id = self.get_batch_info()
 
     def get_batch_info(self):
         "To get batch date and Batch ID variable"
-        pass
+        query = f"""
+                    SELECT BATCH_DATE, BATCH_ID FROM {CONFIG_SCHEMA}.{BATCH_DATE_TABLE}
+                """
+        query_result = self.sf_db.execute_query(query).fetchone()
+        batch_date, batch_id = query_result[0], query_result[1]
+        return batch_date, batch_id
     
     def is_script_audited(self):
         "Checks if script presents on the scaript table if not the script must be audited on the table to run"
-        pass
-    def get_script_info(self):
+        query = f"""
+        SELECT 1 FROM {CONFIG_SCHEMA}.{EXTRACTION_SCRIPT_TABLE}
+        WHERE SCRIPT_NAME = '{self.script_name}'
+        """
+        query_result = self.sf_db.execute_query(query).fetchone()
+        return True if query_result else False
+    def get_script_exe_status(self):
         "Get status of the script from log table"
         pass
     def insert_script_to_log(self):
