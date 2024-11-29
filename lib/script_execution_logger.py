@@ -19,26 +19,44 @@ class ScriptExeLog:
     def is_script_audited(self):
         "Checks if script presents on the scaript table if not the script must be audited on the table to run"
         query = f"""
-        SELECT 1 FROM {CONFIG_SCHEMA}.{EXTRACTION_SCRIPT_TABLE}
+        SELECT SCRIPT_ID  FROM {CONFIG_SCHEMA}.{EXTRACTION_SCRIPT_TABLE}
         WHERE SCRIPT_NAME = '{self.script_name}'
         """
         query_result = self.sf_db.execute_query(query).fetchone()
+        if query_result:
+            self.script_id = query_result[0]
         return True if query_result else False
     def get_script_exe_status(self):
         "Get status of the script from log table"
-        pass
+        self.get_batch_info()
+        query = f"""
+                    SELECT STATUS FROM {CONFIG_SCHEMA}.{EXTRACTION_BATCH_LOG_TABLE} WHERE JOB_NAME = '{self.script_name} AND BATCH_DATE = '{self.batch_date}'
+                """
+        query_result = self.sf_db.execute_query(query).fetchone()
+        self.status = query_result[0]
+        return self.status
     def insert_script_to_log(self):
         "Loads script in to log table with the status assigned to 'RNNING'"
-        pass
-    def insert_error_status(self):
+        query = f"""
+                    INSERT INTO {CONFIG_SCHEMA}.{EXTRACTION_BATCH_LOG_TABLE} (BATCH_DATE,SCRIPT_ID,STATUS)
+                    VALUES ({self.batch_date},{self.script_id},'RUNNING')
+
+                """
+        self.sf_db.execute_query(query)
+    def update_error_status(self):
         "Updates status of script to 'ERROR' in case of error"
-        pass
-    def insert_success_status(self):
+        query = f"""
+                    UPDATE {CONFIG_SCHEMA}.{EXTRACTION_BATCH_LOG_TABLE} SET STATUS = 'ERROR' , END_TIME = CURRENT_TIMESTAMP()
+                    WHERE SCRIPT_ID = {self.script_id} and BATCH_DATE = {self.batch_date}
+
+                """
+        self.sf_db.execute_query(query)
+    def update_success_status(self):
         "Updates status of script to 'SUCCESS' in case of completion of script with out error"
-        pass
-    def check_running_status(self):
-        "Cheks script status on log table if it is on the running state, aviod to re-running of running script"
-        pass
-    def check_error_status(self):
-        "Cheks script status on log table if it has 'ERROR' status, aviod to re-running of running script"
-        pass
+        query = f"""
+                    UPDATE {CONFIG_SCHEMA}.{EXTRACTION_BATCH_LOG_TABLE} SET STATUS = 'SUCCESS' , END_TIME = CURRENT_TIMESTAMP()
+                    WHERE SCRIPT_ID = {self.script_id} and BATCH_DATE = {self.batch_date}
+
+                """
+        self.sf_db.execute_query(query)
+    
