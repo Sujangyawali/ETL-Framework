@@ -42,6 +42,19 @@ class SnowflakeDatabase:
         except Exception as qe:
             self.log.log_message(f"Error executing query.\n {qe}")
             raise Exception(f"Error executing query: {qe}")
+        
+    def get_queried_data(self, query: str):
+        self.log.log_message(f"Executing query: \n {query} ")
+        try:
+            self.query = query
+            self.cursor.execute(f"USE ROLE {self.role}")
+            self.cursor.execute(self.query)
+            self.log.log_message(f"Query executed successfully.")
+            self.log.log_message(f"Number of rows: {self.cursor.rowcount} .")
+        except Exception as qe:
+            self.log.log_message(f"Error executing query.\n {qe}")
+            raise Exception(f"Error executing query: {qe}")
+        return self.cursor.fetchall()
     
     def load_s3_to_landing(self, s3_file, landing_table):
         self.log.log_message(f"Loading data from S3 to landing table: {landing_table}")

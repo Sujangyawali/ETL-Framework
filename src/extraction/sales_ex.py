@@ -36,11 +36,12 @@ log.log_message("Database instance created")
 script_exe_log_object = ScriptExeLog(sf_object, script_name, SF_LANDING_TABLE)
 
 if not script_exe_log_object.is_script_audited():
-    raise Exception(f"Script is not audited into {EXTRACTION_SCRIPT_TABLE}, please audit the script first to run the script.")
+    raise Exception(f"Script is not audited into {EXTRACTION_SCRIPT_TABLE} table, please audit the script first to run..")
 if script_exe_log_object.get_script_exe_status() == 'RUNNING':
-        raise Exception(f"Script is already in 'RUNNING' for current bath")
+    raise Exception(f"Script is already in 'RUNNING' for Current Batch")
 else:
     try:
+        script_exe_log_object.remove_existing_log_for_current_batch()
         script_exe_log_object.insert_script_to_log()
         db.connect()
         log.log_message(f" Extracting data from  {EXT_SRC_SCHEMA}.{SOURCE_TABLE} Started...")
@@ -53,7 +54,7 @@ else:
         #     s3_file_object.connect_s3()
         #     s3_file_object.upload_csv_to_s3_landing(csv_file, file_name_on_bucket)
         #     sf_object.load_s3_to_landing(file_name_on_bucket, SF_LANDING_TABLE)
-        # script_exe_log_object.update_success_status()
+        script_exe_log_object.update_success_status()
     except Exception as e:
         script_exe_log_object.update_error_status()
         raise Exception(f"[ERROR]: Error while extracting from MYsql Database.")
