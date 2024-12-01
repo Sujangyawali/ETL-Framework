@@ -11,10 +11,6 @@ from lib.script_execution_logger import ScriptExeLog
 script_name = os.path.basename(__file__)
 script_name = os.path.splitext(script_name)[0]
 log = Logger(script_name)
-log.log_message(f"Scripts for {script_name} has been started")
-
-
-log.log_message(f"Initialising object for {script_name}")
 
 DB_HOST = DB_HOST
 DB_USER = DB_USER
@@ -36,8 +32,12 @@ log.log_message("Database instance created")
 script_exe_log_object = ScriptExeLog(sf_object, script_name, SF_LANDING_TABLE)
 
 if not script_exe_log_object.is_script_audited():
+    sf_object.end_connection()
+    log.close()
     raise Exception(f"Script is not audited into {EXTRACTION_SCRIPT_TABLE} table, please audit the script first to run..")
 if script_exe_log_object.get_script_exe_status() == 'RUNNING':
+    sf_object.end_connection()
+    log.close()
     raise Exception(f"Script is already in 'RUNNING' for Current Batch")
 else:
     try:
@@ -60,6 +60,7 @@ else:
         raise Exception(f"[ERROR]: Error while extracting from MYsql Database.")
     finally:
         db.end_connection()
+        sf_object.end_connection()
         # s3_file_object.end_connection()
         log.close()
 
