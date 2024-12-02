@@ -20,6 +20,6 @@ class APIExtractor:
             else:
                 self.log.log_message(f"API request failed with status code {response.status_code}\n.Messages:{response.json()['messages']}")
         except Exception as e:
-            print(e)
             self.log.log_message(f"An error occured {e}")
+            raise Exception(f"[ERROR]: Error while requesting REST API: \n {e}")
         
