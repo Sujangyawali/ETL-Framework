@@ -69,6 +69,6 @@ else:
     finally:
         sftp_object.close()
         sf_object.end_connection()
-        # s3_file_object.end_connection()
+        s3_file_object.end_connection()
         log.close()
 

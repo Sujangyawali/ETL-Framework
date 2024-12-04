@@ -49,11 +49,11 @@ else:
         log.log_message(f"Extraction Query:\n {EXTRACT_SQL}")
         csv_file = db.extract_to_csv(EXTRACT_SQL, SOURCE_TABLE.lower(), chunk_size=100)
         file_name_on_bucket = os.path.basename(csv_file)
-        # if csv_file:
-        #     s3_file_object = S3ObjectManager(log)
-        #     s3_file_object.connect_s3()
-        #     s3_file_object.upload_csv_to_s3_landing(csv_file, file_name_on_bucket)
-        #     sf_object.load_s3_to_landing(file_name_on_bucket, SF_LANDING_TABLE)
+        if csv_file:
+            s3_file_object = S3ObjectManager(log)
+            s3_file_object.connect_s3()
+            s3_file_object.upload_csv_to_s3_landing(csv_file, file_name_on_bucket)
+            sf_object.load_s3_to_landing(file_name_on_bucket, SF_LANDING_TABLE)
         script_exe_log_object.update_success_status()
     except Exception as e:
         script_exe_log_object.update_error_status()
@@ -61,6 +61,6 @@ else:
     finally:
         db.end_connection()
         sf_object.end_connection()
-        # s3_file_object.end_connection()
+        s3_file_object.end_connection()
         log.close()
 

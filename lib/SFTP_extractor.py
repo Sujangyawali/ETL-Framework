@@ -47,7 +47,6 @@ class SFTP:
         try:
             file_name = os.path.basename(server_path)
             local_file_path = os.path.join(DATA_DIR, file_name)
-            print(server_path,local_file_path)
             self.sftp.get(server_path, local_file_path)
             self.log.log_message(f"File '{file_name}' loaded to local directory")
             # self.delete_file_on_server(server_path)
