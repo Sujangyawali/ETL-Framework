@@ -1,0 +1,11 @@
+CREATE OR REPLACE VIEW RDW_STG_V.V_STG_PRDCT_CATGRY (
+    ASIN
+    ,PROD_TITLE
+    ,PROD_PRICE
+) AS ( 
+        SELECT
+            ASIN
+            ,PRODUCT_TITLE
+            ,PRODUCT_PRICE
+        FROM RDW_LND.LND_PRDCT_CATGRY
+    );

@@ -1,0 +1,45 @@
+CREATE OR REPLACE TABLE RDW_STG_V.V_STG_LND_SALES (
+    TXTN_ID
+    ,TXTN_LINE_ID
+    ,STR_ID
+    ,REG_ID
+    ,EMP_ID
+    ,CUSTMR_ID
+    ,LOY_CRD_NUM
+    ,ITEM_ID
+    ,ITEM_DESC
+    ,SLS_QTY
+    ,PRICE
+    ,DISCNT
+    ,TAX
+    ,SLS_AMT
+    ,PAYMNT_MTHD
+    ,TXTN_STATUS
+    ,RTRN_FLG
+    ,PROMO_CDE
+    ,SLS_CHNL
+    ,RCPT_NUM
+) AS ( 
+        SELECT
+            TRANSACTION_ID
+            ,TRANSACTION_LINE_ID
+            ,STORE_ID
+            ,REGISTER_ID
+            ,EMPLOYEE_ID
+            ,CUSTOMER_ID
+            ,LOYALTY_CARD_NUMBER
+            ,ITEM_ID
+            ,ITEM_DESCRIPTION
+            ,QUANTITY
+            ,PRICE
+            ,DISCOUNT
+            ,TAX
+            ,TOTAL_AMOUNT
+            ,PAYMENT_METHOD
+            ,TRANSACTION_STATUS
+            ,RETURN_FLAG
+            ,PROMOTION_CODE
+            ,SALES_CHANNEL
+            ,RECEIPT_NUMBER
+        FROM RDW_LND.LND_SALES
+    );
