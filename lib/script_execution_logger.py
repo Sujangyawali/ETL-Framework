@@ -1,9 +1,11 @@
 from config.env_setup import *
 from lib.snowflake import SnowflakeDatabase
 class ScriptExeLog:
-    def __init__(self, sf_db: SnowflakeDatabase, script_name):
+    def __init__(self, sf_db: SnowflakeDatabase, script_name, script_audit_table , batch_log_table):
         self.script_name = script_name
         self.sf_db = sf_db
+        self.script_audit_table = script_audit_table
+        self.batch_log_table = batch_log_table
         self.batch_date, self.batch_id = self.get_batch_info()
 
     def get_batch_info(self):
@@ -18,7 +20,7 @@ class ScriptExeLog:
     def is_script_audited(self):
         "Checks if script presents on the scaript table if not the script must be audited on the table to run"
         query = f"""
-        SELECT SCRIPT_ID  FROM {CONFIG_SCHEMA}.{EXTRACTION_SCRIPT_TABLE}
+        SELECT SCRIPT_ID  FROM {CONFIG_SCHEMA}.{self.script_audit_table}
         WHERE SCRIPT_NAME = '{self.script_name}'
         """
         query_result = self.sf_db.get_queried_data(query)
@@ -29,7 +31,7 @@ class ScriptExeLog:
         "Get status of the script from log table"
         self.get_batch_info()
         query = f"""
-                    SELECT STATUS FROM {CONFIG_SCHEMA}.{EXTRACTION_BATCH_LOG_TABLE} WHERE SCRIPT_NAME = '{self.script_name}' AND BATCH_DATE = '{self.batch_date}'
+                    SELECT STATUS FROM {CONFIG_SCHEMA}.{self.batch_log_table} WHERE SCRIPT_NAME = '{self.script_name}' AND BATCH_DATE = '{self.batch_date}'
                 """
         query_result = self.sf_db.get_queried_data(query)
         if query_result:
@@ -44,13 +46,13 @@ class ScriptExeLog:
         it must be done manully, after analysis of consequeses.
         """
         query = f"""
-                    DELETE FROM {CONFIG_SCHEMA}.{EXTRACTION_BATCH_LOG_TABLE} WHERE SCRIPT_NAME = '{self.script_name}' AND BATCH_DATE = '{self.batch_date}'
+                    DELETE FROM {CONFIG_SCHEMA}.{self.batch_log_table} WHERE SCRIPT_NAME = '{self.script_name}' AND BATCH_DATE = '{self.batch_date}'
                 """
         self.sf_db.execute_query(query)
     def insert_script_to_log(self):
         "Loads script in to log table with the status assigned to 'RNNING'"
         query = f"""
-                    INSERT INTO {CONFIG_SCHEMA}.{EXTRACTION_BATCH_LOG_TABLE} (BATCH_DATE,SCRIPT_ID,SCRIPT_NAME,STATUS)
+                    INSERT INTO {CONFIG_SCHEMA}.{self.batch_log_table} (BATCH_DATE,SCRIPT_ID,SCRIPT_NAME,STATUS)
                     VALUES ('{self.batch_date}',{self.script_id},'{self.script_name}','RUNNING')
 
                 """
@@ -58,7 +60,7 @@ class ScriptExeLog:
     def update_error_status(self):
         "Updates status of script to 'ERROR' in case of error"
         query = f"""
-                    UPDATE {CONFIG_SCHEMA}.{EXTRACTION_BATCH_LOG_TABLE} SET STATUS = 'ERROR' , END_TIME = CURRENT_TIMESTAMP()
+                    UPDATE {CONFIG_SCHEMA}.{self.batch_log_table} SET STATUS = 'ERROR' , END_TIME = CURRENT_TIMESTAMP()
                     WHERE SCRIPT_ID = {self.script_id} and BATCH_DATE = '{self.batch_date}'
 
                 """
@@ -66,7 +68,7 @@ class ScriptExeLog:
     def update_success_status(self):
         "Updates status of script to 'SUCCESS' in case of completion of script with out error"
         query = f"""
-                    UPDATE {CONFIG_SCHEMA}.{EXTRACTION_BATCH_LOG_TABLE} SET STATUS = 'SUCCESS' , END_TIME = CURRENT_TIMESTAMP()
+                    UPDATE {CONFIG_SCHEMA}.{self.batch_log_table} SET STATUS = 'SUCCESS' , END_TIME = CURRENT_TIMESTAMP()
                     WHERE SCRIPT_ID = {self.script_id} and BATCH_DATE = '{self.batch_date}'
 
                 """

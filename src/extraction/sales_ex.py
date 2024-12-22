@@ -29,7 +29,7 @@ sf_object = SnowflakeDatabase(log)
 sf_object.connect()
 
 log.log_message("Database instance created")
-script_exe_log_object = ScriptExeLog(sf_object, script_name)
+script_exe_log_object = ScriptExeLog(sf_object, script_name, EXTRACTION_SCRIPT_TABLE, EXTRACTION_BATCH_LOG_TABLE)
 
 if not script_exe_log_object.is_script_audited():
     sf_object.end_connection()

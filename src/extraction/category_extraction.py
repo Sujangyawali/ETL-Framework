@@ -44,7 +44,7 @@ api_instance = APIExtractor(url, API_KEY, headers = headers, params = params, lo
 sf_object = SnowflakeDatabase(log)
 sf_object.connect()
 log.log_message(f"Completed API object for initialization")
-script_exe_log_object = ScriptExeLog(sf_object, script_name)
+script_exe_log_object = ScriptExeLog(sf_object, script_name, EXTRACTION_SCRIPT_TABLE, EXTRACTION_BATCH_LOG_TABLE)
 
 
 if not script_exe_log_object.is_script_audited():
