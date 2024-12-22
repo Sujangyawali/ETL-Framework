@@ -1,9 +1,8 @@
 from config.env_setup import *
 from lib.snowflake import SnowflakeDatabase
 class ScriptExeLog:
-    def __init__(self, sf_db: SnowflakeDatabase, script_name, landing_table):
+    def __init__(self, sf_db: SnowflakeDatabase, script_name):
         self.script_name = script_name
-        self.landing_table = landing_table
         self.sf_db = sf_db
         self.batch_date, self.batch_id = self.get_batch_info()
 

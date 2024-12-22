@@ -28,7 +28,7 @@ log.log_message(f"SFTP instance created")
 sf_object = SnowflakeDatabase(log)
 sf_object.connect()
 log.log_message("Snowflake Database instance created")
-script_exe_log_object = ScriptExeLog(sf_object, script_name, SF_LANDING_TABLE)
+script_exe_log_object = ScriptExeLog(sf_object, script_name)
 
 if not script_exe_log_object.is_script_audited():
     sf_object.end_connection()
