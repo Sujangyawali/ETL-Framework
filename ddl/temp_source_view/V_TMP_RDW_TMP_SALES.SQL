@@ -1,0 +1,49 @@
+CREATE OR REPLACE VIEW RDW_TMP_V.V_TMP_RDW_TMP_SALES (
+    TXTN_ID
+    ,STR_KEY
+    ,REG_KEY
+    ,CHNL_KEY
+    ,ITEM_KEY
+    ,TXTN_LINE_ID
+    ,DAY
+    ,EMP_ID
+    ,CUSTMR_ID
+    ,LOY_CRD_NUM
+    ,PAYMNT_MTHD
+    ,TXTN_STATUS
+    ,RTRN_FLG
+    ,PROMO_CDE
+    ,RCPT_NUM
+    ,SLS_QTY
+    ,PRICE
+    ,DISCNT
+    ,TAX
+    ,SLS_AMT
+) AS (
+    SELECT 
+        SLS.TXTN_ID
+        ,999 AS STR_KEY -- LOC.STR_KEY
+        ,999 AS REG_KEY -- LOC.REG_KEY
+        ,999 AS CHNL_KEY -- LOC.CHNL_KEY
+        ,999 AS ITEM_KEY -- PRD.ITEM_KEY
+        ,SLS.TXTN_LINE_ID
+        ,SLS.DAY
+        ,SLS.EMP_ID
+        ,SLS.CUSTMR_ID
+        ,SLS.LOY_CRD_NUM
+        ,SLS.PAYMNT_MTHD
+        ,SLS.TXTN_STATUS
+        ,SLS.RTRN_FLG
+        ,SLS.PROMO_CDE
+        ,SLS.RCPT_NUM
+        ,SLS.SLS_QTY
+        ,SLS.PRICE
+        ,SLS.DISCNT
+        ,SLS.TAX
+        ,SLS.SLS_AMT
+    FROM RDW_STG_V.V_STG_LND_SALES SLS
+    -- INNER JOIN RDW_TGT.RDW_TGT_LOCATION LOC -- Need to build 
+    -- ON SLS.STR_ID = LOC.STR_ID
+    -- INNER JOIN RDW_TGT.RDW_TGT_PRDCT PRD
+    -- ON SLS.ITEM_ID = PRD.ITEM_ID
+)
