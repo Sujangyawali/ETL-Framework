@@ -7,9 +7,9 @@ CREATE OR REPLACE VIEW RDW_TMP_V.V_TMP_RDW_TMP_STRE_CLZ(
 ) AS (
     SELECT 
         LOC_ID
-        ,LOC_NAME
+        ,LOC_DESC
         ,INCDNT_DATE
         ,INCDNT_TIME
         ,REPORT_DATE
     FROM RDW_STG_V.V_STG_STRE_CLZ
-)
+);
