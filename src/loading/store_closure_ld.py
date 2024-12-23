@@ -10,7 +10,7 @@ script_name = os.path.splitext(script_name)[0]
 log = Logger(script_name)
 
 VIEWS_TABLES = {
-    "SOURCE_VIEW": "V_STG_PRDCT_CATGRY",
+    "SOURCE_VIEW": "V_STG_STRE_CLZ",
     "TEMP_TABLE_SOURCE_VIEW": "V_TMP_RDW_TMP_PROD_CATGRY",
     "TEMP_TABLE": "RDW_TMP_PROD_CATGRY",
     "TARGET_TABLE": "RDW_TGT_PROD_CATGRY"
@@ -35,45 +35,55 @@ else:
         sf_object.turncate_table(TEMP_SCHEMA, VIEWS_TABLES['TEMP_TABLE'])
         query_insert_into_temp_table = f"""
                                         INSERT INTO {TEMP_SCHEMA}.{VIEWS_TABLES['TEMP_TABLE']} (
-                                        ASIN_ID
-                                        ,PROD_TITLE
-                                        ,PROD_PRICE
+                                        LOC_ID
+                                        ,LOC_NAME
+                                        ,INCDNT_DATE
+                                        ,INCDNT_TIME
+                                        ,REPORT_DATE
                                         )
                                         SELECT
-                                            ASIN_ID
-                                            ,PROD_TITLE
-                                            ,PROD_PRICE
+                                            LOC_ID
+                                            ,LOC_NAME
+                                            ,INCDNT_DATE
+                                            ,INCDNT_TIME
+                                            ,REPORT_DATE
                                         FROM {TEMP_VIEW_SCHEMA}.{VIEWS_TABLES['TEMP_TABLE_SOURCE_VIEW']}
                                         """
         sf_object.insert_into_table(VIEWS_TABLES['TEMP_TABLE_SOURCE_VIEW'], VIEWS_TABLES['TEMP_TABLE'], query_insert_into_temp_table)
         query_update_target_using_temp = f"""
                                     UPDATE {VIEWS_TABLES['TARGET_TABLE']} TGT 
-                                    SET TGT.PROD_TITLE = SRC.PROD_TITLE,
-                                    TGT.PROD_PRICE = SRC.PROD_PRICE,
+                                    SET TGT.LOC_NAME = SRC.LOC_NAME,
+                                    TGT.INCDNT_DATE = SRC.INCDNT_DATE,
+                                    TGT.INCDNT_TIME = SRC.INCDNT_TIME,
+                                    TGT.REPORT_DATE = SRC.REPORT_DATE,
                                     TGT.RCD_UPDATE_TS = CURRENT_TIMESTAMP
                                     FROM {VIEWS_TABLES['TEMP_TABLE']} SRC
-                                    WHERE SRC.ASIN_ID = TGT.ASIN_ID 
+                                    WHERE SRC.LOC_ID = TGT.LOC_ID 
                                     """
         sf_object.update_table(VIEWS_TABLES['TARGET_TABLE'], query_update_target_using_temp)
         query_insert_target_using_temp = f"""
                                         INSERT INTO {VIEWS_TABLES['TARGET_TABLE']} (
-                                            ASIN_ID
-                                            ,ASIN_KEY
-                                            ,PROD_TITLE
-                                            ,PROD_PRICE
+                                            LOC_ID
+                                            ,LOC_KEY
+                                            ,LOC_NAME
+                                            ,INCDNT_DATE
+                                            ,INCDNT_TIME
+                                            ,REPORT_DATE
                                             ,RCD_INSERT_TS
                                             ,RCD_UPDATE_TS
                                         )
                                         SELECT
-                                            ASIN_ID
-                                            ,(SELECT MAX(ASIN_KEY) FROM {VIEWS_TABLES['TARGET_TABLE']}) + RANK()  OVER (ORDER BY ASIN_ID) AS ASIN_KEY
-                                            ,PROD_TITLE
-                                            ,PROD_PRICE
-                                            ,CURRENT_TIMESTAMP RCD_INSERT_TS
-                                            ,CURRENT_TIMESTAMP RCD_UPDATE_TS
+                                            LOC_ID
+                                            ,(SELECT MAX(LOC_KEY) FROM {VIEWS_TABLES['TARGET_TABLE']}) + RANK()  OVER (ORDER BY LOC_ID) AS LOC_KEY
+                                            ,LOC_NAME
+                                            ,INCDNT_DATE
+                                            ,INCDNT_TIME
+                                            ,REPORT_DATE
+                                            ,CURRENT_TIMESTAMP AS RCD_INSERT_TS
+                                            ,CURRENT_TIMESTAMP AS RCD_UPDATE_TS
                                         FROM {VIEWS_TABLES['TEMP_TABLE']} SRC
-                                        WHERE (ASIN_ID)
-                                        NOT IN (SELECT ASIN_ID FROM {VIEWS_TABLES['TARGET_TABLE']}
+                                        WHERE (LOC_ID)
+                                        NOT IN (SELECT LOC_ID FROM {VIEWS_TABLES['TARGET_TABLE']}
                                         """
         sf_object.insert_into_table({VIEWS_TABLES['TEMP_TABLE']}, VIEWS_TABLES['TARGET_TABLE'], query_insert_target_using_temp)
         log.log_message(f"Loading completed")
