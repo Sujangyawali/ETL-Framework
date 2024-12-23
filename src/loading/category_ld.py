@@ -10,10 +10,10 @@ script_name = os.path.splitext(script_name)[0]
 log = Logger(script_name)
 
 VIEWS_TABLES = {
-    "SOURCE_VIEW": "V_STG_LND_SALES",
-    "TEMP_TABLE_SOURCE_VIEW": "V_TMP_RDW_TMP_SALES",
-    "TEMP_TABLE": "RDW_TMP_SALES",
-    "TARGET_TABLE": "RDW_TGT_SALES"
+    "SOURCE_VIEW": "V_STG_PRDCT_CATGRY",
+    "TEMP_TABLE_SOURCE_VIEW": "V_TMP_RDW_TMP_PROD_CATGRY",
+    "TEMP_TABLE": "RDW_TMP_PROD_CATGRY",
+    "TARGET_TABLE": "RDW_TGT_PROD_CATGRY"
 }
 
 sf_object = SnowflakeDatabase(log)
@@ -35,75 +35,24 @@ else:
         sf_object.turncate_table(TEMP_SCHEMA, VIEWS_TABLES['TEMP_TABLE'])
         query_insert_into_temp_table = f"""
                                         INSERT INTO {TEMP_SCHEMA}.{VIEWS_TABLES['TEMP_TABLE']} (
-                                        TXTN_ID
-                                        ,STR_KEY
-                                        ,REG_KEY
-                                        ,SLS_KEY
-                                        ,ITEM_KEY
-                                        ,TXTN_LINE_ID
-                                        ,DAY
-                                        ,EMP_ID
-                                        ,CUSTMR_ID
-                                        ,LOY_CRD_NUM
-                                        ,PAYMNT_MTHD
-                                        ,TXTN_STATUS
-                                        ,RTRN_FLG
-                                        ,PROMO_CDE
-                                        ,RCPT_NUM
-                                        ,SLS_QTY
-                                        ,PRICE
-                                        ,DISCNT
-                                        ,TAX
-                                        ,SLS_AMT
+                                        ASIN_ID
+                                        ,PROD_TITLE
+                                        ,PROD_PRICE
                                         )
                                         SELECT
-                                            TXTN_ID
-                                            ,STR_KEY
-                                            ,REG_KEY
-                                            ,SLS_KEY
-                                            ,ITEM_KEY
-                                            ,TXTN_LINE_ID
-                                            ,DAY
-                                            ,EMP_ID
-                                            ,CUSTMR_ID
-                                            ,LOY_CRD_NUM
-                                            ,PAYMNT_MTHD
-                                            ,TXTN_STATUS
-                                            ,RTRN_FLG
-                                            ,PROMO_CDE
-                                            ,RCPT_NUM
-                                            ,SLS_QTY
-                                            ,PRICE
-                                            ,DISCNT
-                                            ,TAX
-                                            ,SLS_AMT
+                                            ASIN_ID
+                                            ,PROD_TITLE
+                                            ,PROD_PRICE
                                         FROM {TEMP_VIEW_SCHEMA}.{VIEWS_TABLES['TEMP_TABLE_SOURCE_VIEW']}
                                         """
         sf_object.insert_into_table(VIEWS_TABLES['TEMP_TABLE_SOURCE_VIEW'], VIEWS_TABLES['TEMP_TABLE'], query_insert_into_temp_table)
         query_update_target_using_temp = f"""
                                     UPDATE {VIEWS_TABLES['TARGET_TABLE']} TGT 
-                                    SET TGT.EMP_ID = SRC.EMP_ID,
-                                    TGT.CUSTMR_ID = SRC.CUSTMR_ID,
-                                    TGT.LOY_CRD_NUM = SRC.LOY_CRD_NUM,
-                                    TGT.PAYMNT_MTHD = SRC.PAYMNT_MTHD,
-                                    TGT.TXTN_STATUS = SRC.TXTN_STATUS,
-                                    TGT.PROMO_CDE = SRC.PROMO_CDE,
-                                    TGT.RCPT_NUM = SRC.RCPT_NUM,
-                                    TGT.SLS_QTY = SRC.SLS_QTY,
-                                    TGT.PRICE = SRC.PRICE,
-                                    TGT.DISCNT = SRC.DISCNT,
-                                    TGT.TAX = SRC.TAX,
-                                    TGT.SLS_AMT = SRC.SLS_AMT,
+                                    SET TGT.PROD_TITLE = SRC.PROD_TITLE,
+                                    TGT.PROD_PRICE = SRC.PROD_PRICE,
                                     TGT.RCD_UPDATE_TS = CURRENT_TIMESTAMP
                                     FROM {VIEWS_TABLES['TEMP_TABLE']} SRC
-                                    WHERE SRC.TXTN_ID = TGT.TXTN_ID 
-                                    AND SRC.TXTN_LINE_ID = TGT.TXTN_LINE_ID
-                                    AND SRC.DAY = TGT.DAY
-                                    AND SRC.STR_KEY = TGT.STR_KEY
-                                    AND SRC.ITEM_KEY = TGT.ITEM_KEY
-                                    AND SRC.RTRN_FLG = TGT.RTRN_FLG
-                                    -- AND (COALESCE(TO_CHAR(SRC.EMP_ID),'0') <> COALESCE(TO_CHAR(TGT.EMP_ID),'0')  -- Prevent to update target record if exactly same record found between target and temp
-                                    -- OR COALESCE(TO_CHAR(SRC.CUSTMR_ID),'0') <> COALESCE(TO_CHAR(TGT.CUSTMR_ID))
+                                    WHERE SRC.ASIN_ID = TGT.ASIN_ID 
                                     """
         sf_object.update_table(VIEWS_TABLES['TARGET_TABLE'], query_update_target_using_temp)
         query_insert_target_using_temp = f"""
