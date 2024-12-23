@@ -1,6 +1,7 @@
 CREATE OR REPLACE TABLE RDW_STG_V.V_STG_LND_SALES (
     TXTN_ID
     ,TXTN_LINE_ID
+    ,DAY
     ,STR_ID
     ,REG_ID
     ,EMP_ID
@@ -23,6 +24,7 @@ CREATE OR REPLACE TABLE RDW_STG_V.V_STG_LND_SALES (
         SELECT
             TRANSACTION_ID
             ,TRANSACTION_LINE_ID
+            ,SALE_DATE
             ,STORE_ID
             ,REGISTER_ID
             ,EMPLOYEE_ID

@@ -77,6 +77,36 @@ class SnowflakeDatabase:
             self.log.log_message(f"Error loading data from S3 to landing table: {e}")
             raise Exception(f"Error loading data from S3 to landing table: {e}")
         
+    def turncate_table(self, schema, table):
+        self.log.log_message(f"Truncating table: {table}")
+        query = f"""
+                    TRUNCATE TABLE {schema}.{table}
+                """
+        try:
+            self.execute_query(query)
+            self.log.log_message(f"Table truncate completed")
+        except Exception as e:
+            self.log.log_message(f"Error truncating table: {e}")
+            raise Exception(f"Error truncating table: {e}")
+
+    def insert_into_table(self, source, target, query):
+        self.log.log_message(f"Inserting data from {source} to {target}")
+        try:
+            self.execute_query(query)
+            self.log.log_message(f"Data inserted successfully")
+        except Exception as e:
+            self.log.log_message(f"Error inserting into table: {e}")
+            raise Exception(f"Error inserting into table: {e}")
+    
+    def update_table(self, table, query):
+        self.log.log_message(f"Updating table: {table}")
+        try:
+            self.execute_query(query)
+            self.log.log_message(f"Table updated successfully")
+        except Exception as e:
+            self.log.log_message(f"Error updating table: {e}")
+            raise Exception(f"Error updating table: {e}")
+
     def end_connection(self):
         if self.connection:
             self.connection.close()
