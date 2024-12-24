@@ -11,9 +11,9 @@ log = Logger(script_name)
 
 VIEWS_TABLES = {
     "SOURCE_VIEW": "V_STG_STRE_CLZ",
-    "TEMP_TABLE_SOURCE_VIEW": "V_TMP_RDW_TMP_PROD_CATGRY",
-    "TEMP_TABLE": "RDW_TMP_PROD_CATGRY",
-    "TARGET_TABLE": "RDW_TGT_PROD_CATGRY"
+    "TEMP_TABLE_SOURCE_VIEW": "V_TMP_RDW_TMP_STRE_CLZ",
+    "TEMP_TABLE": "RDW_TMP_STRE_CLZ",
+    "TARGET_TABLE": "RDW_TGT_STRE_CLZ"
 }
 
 sf_object = SnowflakeDatabase(log)
@@ -36,14 +36,14 @@ else:
         query_insert_into_temp_table = f"""
                                         INSERT INTO {TEMP_SCHEMA}.{VIEWS_TABLES['TEMP_TABLE']} (
                                         LOC_ID
-                                        ,LOC_NAME
+                                        ,LOC_DESC
                                         ,INCDNT_DATE
                                         ,INCDNT_TIME
                                         ,REPORT_DATE
                                         )
                                         SELECT
                                             LOC_ID
-                                            ,LOC_NAME
+                                            ,LOC_DESC
                                             ,INCDNT_DATE
                                             ,INCDNT_TIME
                                             ,REPORT_DATE
@@ -51,21 +51,21 @@ else:
                                         """
         sf_object.insert_into_table(VIEWS_TABLES['TEMP_TABLE_SOURCE_VIEW'], VIEWS_TABLES['TEMP_TABLE'], query_insert_into_temp_table)
         query_update_target_using_temp = f"""
-                                    UPDATE {VIEWS_TABLES['TARGET_TABLE']} TGT 
-                                    SET TGT.LOC_NAME = SRC.LOC_NAME,
+                                    UPDATE {TARGET_SCHEMA}.{VIEWS_TABLES['TARGET_TABLE']} TGT 
+                                    SET TGT.LOC_DESC = SRC.LOC_DESC,
                                     TGT.INCDNT_DATE = SRC.INCDNT_DATE,
                                     TGT.INCDNT_TIME = SRC.INCDNT_TIME,
                                     TGT.REPORT_DATE = SRC.REPORT_DATE,
                                     TGT.RCD_UPDATE_TS = CURRENT_TIMESTAMP
-                                    FROM {VIEWS_TABLES['TEMP_TABLE']} SRC
+                                    FROM {TEMP_SCHEMA}.{VIEWS_TABLES['TEMP_TABLE']} SRC
                                     WHERE SRC.LOC_ID = TGT.LOC_ID 
                                     """
         sf_object.update_table(VIEWS_TABLES['TARGET_TABLE'], query_update_target_using_temp)
         query_insert_target_using_temp = f"""
-                                        INSERT INTO {VIEWS_TABLES['TARGET_TABLE']} (
+                                        INSERT INTO {TARGET_SCHEMA}.{VIEWS_TABLES['TARGET_TABLE']} (
                                             LOC_ID
                                             ,LOC_KEY
-                                            ,LOC_NAME
+                                            ,LOC_DESC
                                             ,INCDNT_DATE
                                             ,INCDNT_TIME
                                             ,REPORT_DATE
@@ -74,16 +74,16 @@ else:
                                         )
                                         SELECT
                                             LOC_ID
-                                            ,(SELECT MAX(LOC_KEY) FROM {VIEWS_TABLES['TARGET_TABLE']}) + RANK()  OVER (ORDER BY LOC_ID) AS LOC_KEY
-                                            ,LOC_NAME
+                                            ,(SELECT COALESCE(MAX(LOC_KEY),0) FROM {TARGET_SCHEMA}.{VIEWS_TABLES['TARGET_TABLE']}) + RANK()  OVER (ORDER BY LOC_ID) AS LOC_KEY
+                                            ,LOC_DESC
                                             ,INCDNT_DATE
                                             ,INCDNT_TIME
                                             ,REPORT_DATE
                                             ,CURRENT_TIMESTAMP AS RCD_INSERT_TS
                                             ,CURRENT_TIMESTAMP AS RCD_UPDATE_TS
-                                        FROM {VIEWS_TABLES['TEMP_TABLE']} SRC
+                                        FROM {TEMP_SCHEMA}.{VIEWS_TABLES['TEMP_TABLE']} SRC
                                         WHERE (LOC_ID)
-                                        NOT IN (SELECT LOC_ID FROM {VIEWS_TABLES['TARGET_TABLE']}
+                                        NOT IN (SELECT LOC_ID FROM {TARGET_SCHEMA}.{VIEWS_TABLES['TARGET_TABLE']})
                                         """
         sf_object.insert_into_table({VIEWS_TABLES['TEMP_TABLE']}, VIEWS_TABLES['TARGET_TABLE'], query_insert_target_using_temp)
         log.log_message(f"Loading completed")

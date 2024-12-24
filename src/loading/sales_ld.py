@@ -38,7 +38,7 @@ else:
                                         TXTN_ID
                                         ,STR_KEY
                                         ,REG_KEY
-                                        ,SLS_KEY
+                                        ,CHNL_KEY
                                         ,ITEM_KEY
                                         ,TXTN_LINE_ID
                                         ,DAY
@@ -60,7 +60,7 @@ else:
                                             TXTN_ID
                                             ,STR_KEY
                                             ,REG_KEY
-                                            ,SLS_KEY
+                                            ,CHNL_KEY
                                             ,ITEM_KEY
                                             ,TXTN_LINE_ID
                                             ,DAY
@@ -81,7 +81,7 @@ else:
                                         """
         sf_object.insert_into_table(VIEWS_TABLES['TEMP_TABLE_SOURCE_VIEW'], VIEWS_TABLES['TEMP_TABLE'], query_insert_into_temp_table)
         query_update_target_using_temp = f"""
-                                    UPDATE {VIEWS_TABLES['TARGET_TABLE']} TGT 
+                                    UPDATE {TARGET_SCHEMA}.{VIEWS_TABLES['TARGET_TABLE']} TGT 
                                     SET TGT.EMP_ID = SRC.EMP_ID,
                                     TGT.CUSTMR_ID = SRC.CUSTMR_ID,
                                     TGT.LOY_CRD_NUM = SRC.LOY_CRD_NUM,
@@ -95,7 +95,7 @@ else:
                                     TGT.TAX = SRC.TAX,
                                     TGT.SLS_AMT = SRC.SLS_AMT,
                                     TGT.RCD_UPDATE_TS = CURRENT_TIMESTAMP
-                                    FROM {VIEWS_TABLES['TEMP_TABLE']} SRC
+                                    FROM {TEMP_SCHEMA}.{VIEWS_TABLES['TEMP_TABLE']} SRC
                                     WHERE SRC.TXTN_ID = TGT.TXTN_ID 
                                     AND SRC.TXTN_LINE_ID = TGT.TXTN_LINE_ID
                                     AND SRC.DAY = TGT.DAY
@@ -107,7 +107,7 @@ else:
                                     """
         sf_object.update_table(VIEWS_TABLES['TARGET_TABLE'], query_update_target_using_temp)
         query_insert_target_using_temp = f"""
-                                        INSERT INTO {VIEWS_TABLES['TARGET_TABLE']} (
+                                        INSERT INTO {TARGET_SCHEMA}.{VIEWS_TABLES['TARGET_TABLE']} (
                                             TXTN_ID
                                             ,TXTN_LINE_KEY
                                             ,STR_KEY
@@ -134,10 +134,10 @@ else:
                                         )
                                         SELECT
                                             TXTN_ID
-                                            ,(SELECT MAX(TXN_LINE_KEY) FROM {VIEWS_TABLES['TARGET_TABLE']}) + RANK()  OVER (ORDER BY TXTN_LINE_ID,DAY,STR_KEY,ITEM_KEY,RTRN_FLG) AS TXTN_LINE_KEY
+                                            ,(SELECT COALESCE(MAX(TXTN_LINE_KEY),0) FROM {TARGET_SCHEMA}.{VIEWS_TABLES['TARGET_TABLE']}) + RANK()  OVER (ORDER BY TXTN_LINE_ID,DAY,STR_KEY,ITEM_KEY,RTRN_FLG) AS TXTN_LINE_KEY
                                             ,STR_KEY
                                             ,REG_KEY
-                                            ,SLS_KEY
+                                            ,CHNL_KEY
                                             ,ITEM_KEY
                                             ,TXTN_LINE_ID
                                             ,DAY
@@ -156,9 +156,9 @@ else:
                                             ,SLS_AMT
                                             ,CURRENT_TIMESTAMP RCD_INSERT_TS
                                             ,CURRENT_TIMESTAMP RCD_UPDATE_TS
-                                        FROM {VIEWS_TABLES['TEMP_TABLE']} SRC
+                                        FROM {TEMP_SCHEMA}.{VIEWS_TABLES['TEMP_TABLE']} SRC
                                         WHERE (TXTN_ID, TXTN_LINE_ID, DAY, STR_KEY, ITEM_KEY, RTRN_FLG)
-                                        NOT IN (SELECT TXTN_ID, TXTN_LINE_ID, DAY, STR_KEY, ITEM_KEY, RTRN_FLG FROM {VIEWS_TABLES['TARGET_TABLE']}
+                                        NOT IN (SELECT TXTN_ID, TXTN_LINE_ID, DAY, STR_KEY, ITEM_KEY, RTRN_FLG FROM {TARGET_SCHEMA}.{VIEWS_TABLES['TARGET_TABLE']})
                                         """
         sf_object.insert_into_table({VIEWS_TABLES['TEMP_TABLE']}, VIEWS_TABLES['TARGET_TABLE'], query_insert_target_using_temp)
         log.log_message(f"Loading completed")

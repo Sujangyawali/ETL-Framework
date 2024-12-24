@@ -47,16 +47,16 @@ else:
                                         """
         sf_object.insert_into_table(VIEWS_TABLES['TEMP_TABLE_SOURCE_VIEW'], VIEWS_TABLES['TEMP_TABLE'], query_insert_into_temp_table)
         query_update_target_using_temp = f"""
-                                    UPDATE {VIEWS_TABLES['TARGET_TABLE']} TGT 
+                                    UPDATE {TARGET_SCHEMA}.{VIEWS_TABLES['TARGET_TABLE']} TGT 
                                     SET TGT.PROD_TITLE = SRC.PROD_TITLE,
                                     TGT.PROD_PRICE = SRC.PROD_PRICE,
                                     TGT.RCD_UPDATE_TS = CURRENT_TIMESTAMP
-                                    FROM {VIEWS_TABLES['TEMP_TABLE']} SRC
+                                    FROM {TEMP_SCHEMA}.{VIEWS_TABLES['TEMP_TABLE']} SRC
                                     WHERE SRC.ASIN_ID = TGT.ASIN_ID 
                                     """
         sf_object.update_table(VIEWS_TABLES['TARGET_TABLE'], query_update_target_using_temp)
         query_insert_target_using_temp = f"""
-                                        INSERT INTO {VIEWS_TABLES['TARGET_TABLE']} (
+                                        INSERT INTO {TARGET_SCHEMA}.{VIEWS_TABLES['TARGET_TABLE']} (
                                             ASIN_ID
                                             ,ASIN_KEY
                                             ,PROD_TITLE
@@ -66,14 +66,14 @@ else:
                                         )
                                         SELECT
                                             ASIN_ID
-                                            ,(SELECT MAX(ASIN_KEY) FROM {VIEWS_TABLES['TARGET_TABLE']}) + RANK()  OVER (ORDER BY ASIN_ID) AS ASIN_KEY
+                                            ,(SELECT COALESCE(MAX(ASIN_KEY),0) FROM {TARGET_SCHEMA}.{VIEWS_TABLES['TARGET_TABLE']}) + RANK()  OVER (ORDER BY ASIN_ID) AS ASIN_KEY
                                             ,PROD_TITLE
                                             ,PROD_PRICE
                                             ,CURRENT_TIMESTAMP RCD_INSERT_TS
                                             ,CURRENT_TIMESTAMP RCD_UPDATE_TS
-                                        FROM {VIEWS_TABLES['TEMP_TABLE']} SRC
+                                        FROM {TEMP_SCHEMA}.{VIEWS_TABLES['TEMP_TABLE']} SRC
                                         WHERE (ASIN_ID)
-                                        NOT IN (SELECT ASIN_ID FROM {VIEWS_TABLES['TARGET_TABLE']}
+                                        NOT IN (SELECT ASIN_ID FROM {TARGET_SCHEMA}.{VIEWS_TABLES['TARGET_TABLE']})
                                         """
         sf_object.insert_into_table({VIEWS_TABLES['TEMP_TABLE']}, VIEWS_TABLES['TARGET_TABLE'], query_insert_target_using_temp)
         log.log_message(f"Loading completed")
