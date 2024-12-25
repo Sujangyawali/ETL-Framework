@@ -1,0 +1,14 @@
+{
+    "config": "Same as .env file on repo",
+    "email_receiptients_list": "sample.email@gmail.com,sample2.email@gmail.com",
+    "extraction_config": {
+        "category_extraction": "ssh /home/path/to/{config} && pyhton path/to/category_extraction.py",
+        "sales_extraction": "ssh /home/path/to/{config} && pyhton path/to/sales_ex.py",
+        "store_closure_extraction": "ssh /home/path/to/{config} && pyhton path/to/store_closure_ex.py"
+    },
+    "load_config": {
+        "category_load": "ssh /home/path/to/{config} && pyhton path/to/category_ld.py",
+        "sales_load": "ssh /home/path/to/{config} && pyhton path/to/sales_ld.py",
+        "store_closure_load": "ssh /home/path/to/{config} && pyhton path/to/store_closure_ld.py"
+    }
+}
