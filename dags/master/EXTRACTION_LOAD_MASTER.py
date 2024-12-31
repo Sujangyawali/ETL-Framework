@@ -3,6 +3,7 @@ from airflow import DAG
 from airflow.operators.empty import EmptyOperator
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow.models import Variable
+from airflow.utils.helpers import chain
 import datetime
 
 ''' 
@@ -84,3 +85,5 @@ with airflow.DAG(
     trigger_store_closure_extraction >> trigger_store_closure_load >> end
 
     [trigger_category_load, trigger_store_closure_load, trigger_sales_extraction] >> trigger_sales_load >> end
+
+    # we can also use helper function for the complex dag dependencies

@@ -6,3 +6,4 @@ data
 get_sample_data.ipynb
 Product.csv
 snowflake_config.sql
+.codegpt
