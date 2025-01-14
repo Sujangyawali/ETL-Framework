@@ -3,6 +3,15 @@
 
 This repository hosts an ETL framework designed to streamline data extraction, transformation, and loading processes. It fetches data from diverse source systems, including APIs, database(MySQL), and FTP servers, ensuring compatibility with a range of input formats. Built with scalability in mind, this framework serves as a foundation for managing data pipelines across multiple systems. While the current implementation targets specific sources, the architecture is extensible, allowing for seamless integration with additional databases(oracle, SQL Server etc.) and data sources in the future.
 
+## Table of Contents
+[Features](#features)\
+[Architecture Diagram](#architecture-diagram)\
+[Technologies Used](#technologies-used)\
+[Dependencies (Getting Started)](#dependencies-getting-started)\
+[Configuration](#configuration)\
+[Error Handling and Logging](#error-handling-and-logging)\
+[Enhancement](#enhancement)
+
 ## Features
 - Performs extraction from multiple source systems, including APIs, databases, and FTP servers.
 - Modular architecture allows seamless integration of new data sources.
